@@ -4,13 +4,18 @@
 
 To run ClusterLoader type:
 ```
-go run cmd/clusterloader.go --kubeconfig=kubeConfig.yaml --testconfig=config.yaml
+go run cmd/clusterloader.go --kubeconfig=kubeConfig.yaml --testconfig=config.yaml --provider=local
 ```
 OR
 ```
-./run-e2e.sh --testconfig=config.yaml
+./run-e2e.sh --testconfig=config.yaml --provider=local
 ```
-Flags kubeconfig and testconfig are necessary.
+
+The simplest way to get acquainted with ClusterLoader is using [kind](https://kind.sigs.k8s.io/). Provision a cluster and ensure you can SSH to localhost. Eg. running the load test:
+
+```
+go run cmd/clusterloader.go --testconfig=testing/load/config.yaml --nodes=1 --provider=kind --kubeconfig=<path-to-kubeconfig> --masterip=127.0.0.1 --mastername=kind-control-plane --master-internal-ip=127.0.0.1
+```
 
 ### Flags
 
@@ -20,7 +25,7 @@ These flags are required for any test to be run.
  - kubeconfig - path to the kubeconfig file.
  - testconfig - path to the test config file. This flag can be used multiple times
 if more than one test should be run.
- - provider - Cluster provider, options are: gce, gke, kubemark, aws, local, vsphere, skeleton
+ - provider - Cluster provider, options are: gce, gke, kind, kubemark, aws, local, vsphere, skeleton
 
 #### Optional
 
@@ -95,6 +100,12 @@ export CL2_ACCESS_TOKENS_QPS=5
 ## Measurement
 
 Currently available measurements are:
+- **APIAvailabilityMeasurement** \
+This measurement collects information about the availability of cluster's control plane. \
+There are two slightly different ways this is measured:
+  - cluster-level availability, where we periodically issue an API call to `/readyz`,
+  - host-level availability, where we periodically poll each of the control plane's host `/readyz` endpoint.
+    - this requires the [exec service](https://github.com/kubernetes/perf-tests/tree/master/clusterloader2/pkg/execservice) to be enabled.
 - **APIResponsivenessPrometheusSimple** \
 This measurement creates percentiles of latency and number for server api calls based on the data collected by the prometheus server. 
 Api calls are divided by resource, subresource, verb and scope. \
@@ -162,6 +173,7 @@ Vendor is created using [Go modules].
 
 [api]: https://github.com/kubernetes/perf-tests/blob/master/clusterloader2/api/types.go
 [API call latencies SLO]: https://github.com/kubernetes/community/blob/master/sig-scalability/slos/api_call_latency.md
+[exec service]: https://github.com/kubernetes/perf-tests/tree/master/clusterloader2/pkg/execservice
 [design doc]: https://github.com/kubernetes/perf-tests/blob/master/clusterloader2/docs/design.md
 [Go modules]: https://blog.golang.org/using-go-modules
 [load deployment template]: https://github.com/kubernetes/perf-tests/blob/master/clusterloader2/testing/load/deployment.yaml
