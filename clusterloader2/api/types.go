@@ -32,7 +32,8 @@ type TestScenario struct {
 	// ConfigPath defines path to the file containing a single Config definition.
 	ConfigPath string `json:"configPath"`
 	// OverridePaths defines what override files should be applied
-	// to the config specified by the ConfigPath.
+	// to the config specified by the ConfigPath. This supersedes the global
+	// config provided by ClusterLoaderConfig.
 	OverridePaths []string `json:"overridePaths"`
 }
 
@@ -41,8 +42,7 @@ type TestScenario struct {
 type Config struct {
 	// Name of the test case.
 	Name string `json:"name"`
-	// Deprecated: a number of automanaged namespaces.
-	// Use Namespace.Number instead.
+	// TODO(#1696): Clean up after removing automanagedNamespaces
 	AutomanagedNamespaces int32 `json:"automanagedNamespaces,omitempty"`
 	// Namespace is a structure for namespace configuration.
 	Namespace NamespaceConfig `json:"namespace"`

@@ -17,7 +17,6 @@ limitations under the License.
 package config
 
 import (
-	"k8s.io/perf-tests/clusterloader2/api"
 	"k8s.io/perf-tests/clusterloader2/pkg/provider"
 )
 
@@ -26,9 +25,11 @@ type ClusterLoaderConfig struct {
 	ClusterConfig     ClusterConfig
 	ReportDir         string
 	EnableExecService bool
-	TestScenario      api.TestScenario
 	ModifierConfig    ModifierConfig
 	PrometheusConfig  PrometheusConfig
+	// OverridePaths defines what override files should be applied
+	// globally to the config specified by the ConfigPath for each TestScenario.
+	OverridePaths []string `json:"overridePaths"`
 }
 
 // ClusterConfig is a structure that represents cluster description.
@@ -45,7 +46,7 @@ type ClusterConfig struct {
 	MasterName          string
 	// Deprecated: use NamespaceConfig.DeleteStaleNamespaces instead.
 	DeleteStaleNamespaces bool
-	// Deprecated: use NamespaceConfig.DeleteAutomanagedNamespaces instead.
+	// TODO(#1696): Clean up after removing automanagedNamespaces
 	DeleteAutomanagedNamespaces bool
 	// APIServerPprofByClientEnabled determines whether kube-apiserver pprof endpoint can be accessed
 	// using kubernetes client. If false, clusterloader will avoid collecting kube-apiserver profiles.
